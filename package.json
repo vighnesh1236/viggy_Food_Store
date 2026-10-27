@@ -1,0 +1,19 @@
+{
+  "name": "bharatbite",
+  "private": true,
+  "engines": {
+    "node": ">=22.12 <23"
+  },
+  "workspaces": [
+    "apps/public-web",
+    "services/api"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @bharatbite/public-web",
+    "dev:api": "npm run dev --workspace @bharatbite/api",
+    "build": "npm run build --workspace @bharatbite/public-web && npm run build --workspace @bharatbite/api",
+    "start": "npm run start --workspace @bharatbite/api",
+    "test": "npm run test --workspace @bharatbite/api",
+    "typecheck": "npm run typecheck --workspace @bharatbite/public-web && npm run typecheck --workspace @bharatbite/api"
+  }
+}
