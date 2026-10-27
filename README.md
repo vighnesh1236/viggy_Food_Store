@@ -27,7 +27,7 @@ Requirements: Node.js 22.12.x and npm 10+.
 2. Set `JWT_SECRET` to a private random value of at least 32 characters.
 3. If customer accounts should persist to Neon, set `DATABASE_URL` to the rotated Neon pooled connection string. Never commit it, put it in `VITE_*`, or expose it in browser code. Production will refuse to start without PostgreSQL configured.
 4. Set a private `DELIVERY_INVITE_CODE` if you want to enable invitation-only delivery-partner sign-up.
-5. To enable human verification locally, create a Cloudflare Turnstile widget for your local host and set both `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Leave both blank to keep local sign-up unchallenged. Production requires both keys.
+5. To enable optional human verification locally, configure both `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Leave both blank to keep sign-up unchallenged; production does not require Cloudflare.
 6. Run `npm ci`.
 7. Run `npm run dev:api` in one terminal.
 8. Run `npm run dev` in another terminal and open `http://localhost:5173`.
@@ -38,13 +38,13 @@ The connection string previously pasted into chat should be considered exposed. 
 
 Delivery-partner registration is invitation-only. `GET /api/v1/auth/options` tells the client whether signup is enabled but never returns the code. Give the private `DELIVERY_INVITE_CODE` only to approved delivery partners; Render can generate it using the blueprint environment settings. The signup form asks for it only when the server has enabled delivery signup.
 
-Human verification uses Cloudflare Turnstile. Create a Turnstile widget in Cloudflare for the exact public hostname, then set its site key as `TURNSTILE_SITE_KEY` and its secret as `TURNSTILE_SECRET_KEY` in server environment settings. The site key is returned by `GET /api/v1/auth/options`; the secret is never exposed. The API verifies each registration token with Cloudflare and rejects missing, expired, or invalid tokens. Both values are required together, and production will not start without them. Never use test keys in production.
+Human verification is optional and uses Cloudflare Turnstile only when both `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` are configured. The site key is returned by `GET /api/v1/auth/options`; the secret is never exposed. When configured, the API verifies registration tokens server-side. Production may run with both values unset, in which case signup does not show a verification challenge.
 
 ## Deployment to Render
 
 The included `render.yaml` deploys the static web build and API together on Render's free Node service. The free instance has an ephemeral filesystem, so production account/cart/order persistence is provided by Neon rather than local SQLite. Create the service through Render's Blueprint flow after pushing this repository to a Git provider connected to your Render account.
 
-The service generates `JWT_SECRET` and `DELIVERY_INVITE_CODE` on initial creation. Add the rotated Neon pooled connection URL as the `DATABASE_URL` secret in Render; deployment startup requires it in production. Set both Cloudflare Turnstile values as Render secrets before the service starts. Copy the generated delivery invite code from the Render environment settings to onboard delivery partners. The same-origin website URL is used for the QR and API, so the QR works across Wi-Fi and mobile networks when the deployment is publicly reachable. Change the `CLIENT_ORIGIN` value in `render.yaml` if Render assigns a different service hostname.
+The service generates `JWT_SECRET` and `DELIVERY_INVITE_CODE` on initial creation. Add the current Neon pooled connection URL as the `DATABASE_URL` secret in Render; deployment startup requires it in production. Cloudflare Turnstile secrets are not required. Copy the generated delivery invite code from the Render environment settings to onboard delivery partners. The same-origin website URL is used for the QR and API, so the QR works across Wi-Fi and mobile networks when the deployment is publicly reachable. Change the `CLIENT_ORIGIN` value in `render.yaml` if Render assigns a different service hostname.
 
 This workspace has not been published or deployed: deployment requires access to the user's hosting account, and the supplied Git repository was empty when inspected. The Render blueprint prepares the deployment but does not create hosting credentials or a public site by itself.
 

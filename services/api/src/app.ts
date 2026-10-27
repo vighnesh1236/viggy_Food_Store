@@ -134,10 +134,6 @@ export function createApplication(options: ApplicationOptions = {}) {
     db.close();
     throw new Error("TURNSTILE_SECRET_KEY and TURNSTILE_SITE_KEY must be configured together.");
   }
-  if (isProduction && (!turnstileSecretKey || !turnstileSiteKey)) {
-    db.close();
-    throw new Error("TURNSTILE_SECRET_KEY and TURNSTILE_SITE_KEY are required in production.");
-  }
   const humanVerificationEnabled = Boolean(turnstileSecretKey && turnstileSiteKey);
   const accountStore: AccountStore = createAccountStore(db, databaseUrl);
   const orderStore = createOrderStore(db, databaseUrl, accountStore.ready);

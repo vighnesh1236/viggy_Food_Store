@@ -17,9 +17,5 @@ services:
         generateValue: true
       - key: DELIVERY_INVITE_CODE
         generateValue: true
-      - key: TURNSTILE_SITE_KEY
-        sync: false
-      - key: TURNSTILE_SECRET_KEY
-        sync: false
       - key: CLIENT_ORIGIN
         value: https://viggy-mart.onrender.com
